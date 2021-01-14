@@ -1,0 +1,38 @@
+[
+    {
+        "name": "mojito",
+        "composition": {
+            "bacardi": 50,
+            "bruiswater": 60,
+            "limoensap": 15
+        }
+    },
+    {
+        "name": "baco",
+        "composition": {
+            "bacardi": 1,
+            "cola": 3
+        }
+    },
+    {
+        "name": "pasoa-jus",
+        "composition": {
+            "jus": 2,
+            "pasoa": 1
+        }
+    },
+    {
+        "name": "raketje",
+        "composition": {
+            "fanta": 4,
+            "schrobbeler": 4
+        }
+    },
+    {
+        "name": "j\u00e4gerbom",
+        "composition": {
+            "fanta": 3,
+            "apfelkorn": 5
+        }
+    }
+]
