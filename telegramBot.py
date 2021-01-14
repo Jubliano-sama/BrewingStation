@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import telebot
 import BookController
 
@@ -6,11 +7,11 @@ bot = telebot.TeleBot(token)
 
 #https://github.com/eternnoir/pyTelegramBotAPI/blob/master/examples/step_example.py
 
-Validcommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles']
+ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles']
 #keyboard = telebot.types.ReplyKeyboardMarkup(True)
 #keyboard.row('/addFles', '/listFles', '/listMix', '/help', '/removeFles')
 
-@bot.message_handler(commands=Validcommands)
+@bot.message_handler(commands=ValidCommands)
 def mainHandler(message):
 	boodschap = message.text
 	print(boodschap)
