@@ -29,7 +29,7 @@ def mainHandler(message):
 	elif boodschap == "/help":
 
 		msg = "Beschikbare commando's zijn: \n"
-		for command in Validcommands:
+		for command in ValidCommands:
 			msg += '/' + command + '\n'
 		
 		bot.send_message(message.chat.id, msg)
