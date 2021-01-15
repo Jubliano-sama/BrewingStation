@@ -1,12 +1,12 @@
 import json
-#test
+
 print("BookController loaded")
 
 def listMixen():
         MixenNames = []
 
-        with open("Receptboek.json") as data:
-                mixen = json.load(data)
+        with open("Receptboek.json") as f:
+                mixen = json.load(f)
         for mix in mixen:
                 mixName = mix["name"]
                 MixenNames.append(mixName)
@@ -35,7 +35,7 @@ def listFlessenForPrint():
                 
         return msg
 
-def addDrink():
+def addMix():
         newDrinkName = input("Naam van het nieuwe drankje: ")
 
         #loop om de alleen door te gaan met 0 < int < 14
@@ -127,3 +127,9 @@ def removeFles(name):
         json.dump(data, outfile, indent = 0)
         outfile.close()
         print(name, "toegevoed")
+
+def updatePositionFlessen(position, flesname):
+        with open("flessenInPosition.json") as f:
+                places = json.load(f)
+
+        places[position]
