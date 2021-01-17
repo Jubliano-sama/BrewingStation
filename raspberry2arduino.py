@@ -7,10 +7,10 @@ GPIO.setup(8, GPIO.OUT )
 drinkAt=0                          #the drink the machine is currently at
 drinkTo=2                          #The drink the machine has to go to
 amountOfSpots=12
-timePerBucket=0.5
+timePerSpot=0.5
 
 distance1= drinkTo-drinkAt         #the distance clockwise
-distance2= distance1- amountOfSpots  #the distance anticlockwise
+distance2= -(distance1-amountOfSpots) #the distance anticlockwise
 
 
 
@@ -18,7 +18,7 @@ distance2= distance1- amountOfSpots  #the distance anticlockwise
 #print(distance2)
 
 if (distance1<=distance2):
-    travelTime = timePerBucket * (distance1)
+    travelTime = timePerSpot * (distance1)
     GPIO.output(8, GPIO.HIGH)   #should change to depending on how the motor works but for now this makes it testable
     print('Switch status = ', GPIO.input(10))
     time.sleep(travelTime)           #wait for the time it takes to get to the destination
@@ -27,9 +27,9 @@ if (distance1<=distance2):
     drinkAt=drinkTo
     print(drinkAt)                   #just to test
 
-#this is the same as above but then in reverse for it to go clockwise in stead of counter
+#this is the same as above but then in reverse for it to go anticlockwise in stead of normal
 else:
-    travelTime=0.5 * (distance2)
+    travelTime=timePerSpot * (distance2)
     GPIO.output(8, GPIO.LOW)
     print('Switch status = ', GPIO.input(10))
     time.sleep(travelTime)
