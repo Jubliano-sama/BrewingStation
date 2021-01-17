@@ -10,7 +10,7 @@ amountOfSpots=12
 timePerBucket=0.5
 
 distance1= drinkTo-drinkAt         #the distance counterclockwise
-distance2= distance1- amountOfSpots  #the distance clockwise
+distance2= distance1- amountOfSpots  #the distance anticlockwise
 
 
 
