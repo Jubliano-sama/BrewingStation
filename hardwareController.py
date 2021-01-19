@@ -23,18 +23,22 @@ def FindPosition():
 def TravelToSpot(spot):
     direction = 1
     currentSpot = FindPosition()
-    #finds fastest way to travel to spot
-    if currentSpot > spot:
-        distance = (spot - currentSpot) + amountOfSpots
-    elif currentSpot < spot:
-        distance = (spot - currentSpot)
-    if distance > amountOfSpots / 2:
-        direction = -1
-    while(FindPosition() is not spot):
-        #motor.on
-        print("Motor is on")
-    #motor.off
-    print("Motor is off")
+    if currentSpot is not spot:
+        #finds fastest way to travel to spot
+        if currentSpot > spot:
+            distance = (spot - currentSpot) + amountOfSpots
+        elif currentSpot < spot:
+            distance = (spot - currentSpot)
+        if distance > amountOfSpots / 2:
+            direction = -1
+        while(FindPosition() is not spot):
+            #motor.on
+            print("Motor is on")
+        #motor.off
+        print("Motor is off")
+    else:
+        print("Not moving. Spot has already been reached.")
+        
 
 
 
