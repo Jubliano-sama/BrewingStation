@@ -27,7 +27,7 @@ def TravelToSpot(spot):
     if currentSpot > spot:
         distance = (spot - currentSpot) + amountOfSpots
     elif currentSpot < spot:
-        direction = (spot - currentSpot)
+        distance = (spot - currentSpot)
     if distance > amountOfSpots / 2:
         direction = -1
     while(FindPosition() is not spot):
