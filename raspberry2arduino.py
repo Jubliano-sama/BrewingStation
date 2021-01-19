@@ -24,7 +24,7 @@ if (distance1<=distance2):
     GPIO.output(8, GPIO.HIGH)   #should change to depending on how the motor works but for now this makes it testable
     print('Switch status = ', GPIO.input(10))
     while(currentVolt < voltPerSpot*drinkTo or currentVolt > voltPerSpot*(drinkTo+1)):    #this loop should break at destination
-        time.sleep(0.01)           #wait for a little while for the loop
+        #motor.on(direction=forward)
     GPIO.output(8, GPIO.LOW)     #machine has to stop here
     print('Switch status = ', GPIO.input(10))
     drinkAt=drinkTo
