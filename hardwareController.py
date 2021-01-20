@@ -1,44 +1,30 @@
 import math
-import busio
-import digitalio
-import board
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
+from gpiozero import MCP3008
 
-# create the spi bus
-spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-# create the cs (chip select)
-cs = digitalio.DigitalInOut(board.D5)
-# create the mcp object
-mcp = MCP.MCP3008(spi, cs)
-# create an analog input channel on pin 0
-chan = AnalogIn(mcp, MCP.P0)
 amountOfSpots = 12
+channel = MCP3008(0)
 
 
-def FindPosition():
-    return math.floor((chan.voltage()) / 3.3)
+def findPosition():
+    return math.floor(channel.voltage / 3.3)
 
 
-def TravelToSpot(spot):
+def travelToSpot(spot):
+
     direction = 1
-    currentSpot = FindPosition()
+    currentSpot = findPosition()
     if currentSpot is not spot:
-        #finds fastest way to travel to spot
+        # finds fastest way to travel to spot
         if currentSpot > spot:
             distance = (spot - currentSpot) + amountOfSpots
         elif currentSpot < spot:
             distance = (spot - currentSpot)
         if distance > amountOfSpots / 2:
             direction = -1
-        while(FindPosition() is not spot):
-            #motor.on
+        while findPosition() is not spot:
+            # motor.on(direction)
             print("Motor is on")
-        #motor.off
+        # motor.off()
         print("Motor is off")
     else:
         print("Not moving. Spot has already been reached.")
-        
-
-
-
