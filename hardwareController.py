@@ -6,15 +6,14 @@ channel = MCP3008(0)
 
 
 def findPosition():
-    return math.floor(channel.voltage / 3.3)
+    return math.floor(channel.value * 12)
 
 
 def travelToSpot(spot):
-
     direction = 1
     currentSpot = findPosition()
     if currentSpot is not spot:
-        # finds fastest way to travel to spot
+        # finds fastest direction to travel to spot
         if currentSpot > spot:
             distance = (spot - currentSpot) + amountOfSpots
         elif currentSpot < spot:
