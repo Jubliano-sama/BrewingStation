@@ -79,5 +79,8 @@ def removeFles(name):
 def updatePositionFlessen(position, flesname):
         with open("flessenInPosition.json") as f:
                 places = json.load(f)
-
-        places[position]
+        places[position] = flesname
+        outfile = open("flessen.json", "w+")
+        
+        json.dump(places, outfile, indent = 0)
+        outfile.close()

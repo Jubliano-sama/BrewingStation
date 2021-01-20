@@ -72,6 +72,7 @@ def handleMixNameAdd(message):
 def handleMixIngredients(message):
 	messageText = message.text
 	messageTextBackup = messageText
+	messageList = []
 	global composition 
 	global mixName
 	
@@ -90,9 +91,10 @@ def handleMixIngredients(message):
 			BookController.addFles(naamFles)
 
 		try: 
-			messageText = messageText.strip()
-			messageText = messageText.title()
-			messageList = messageText.split(" ")
+			if messageList == []:
+				messageText = messageText.strip()
+				messageText = messageText.title()
+				messageList = messageText.split(" ")
 			naamFles = messageList[0]
 			deelVanMix = int(messageList[1])
 			if naamFles in BookController.listFlessen():
