@@ -111,7 +111,7 @@ def handleMixIngredients(message):
 				bot.register_next_step_handler(msg, handleMixIngredients)
 	
 	else: 
-		BookController.addMix(mixName, composition)
+		BookController.addMix(BookController.Mix(mixName, composition))
 		text = "Proficiat " + mixName + " staat nu in het receptenboek."
 		bot.send_message(message.chat.id, text)
 		
