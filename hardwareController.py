@@ -1,6 +1,8 @@
 import math
 from gpiozero import MCP3008
 
+print("hardwareController loaded")
+
 amountOfSpots = 12
 channel = MCP3008(0)
 

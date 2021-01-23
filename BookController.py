@@ -2,82 +2,114 @@ import json
 
 print("BookController loaded")
 
-def listMixen():
-        MixenNames = []
 
-        with open("Receptboek.json") as f:
-                mixen = json.load(f)
-        for mix in mixen:
-                mixName = mix["name"]
-                MixenNames.append(mixName)
-        return MixenNames
+class Mix:
+    def __init__(self, name="", ingredients={}):
+        self.name = name
+        self.ingredients = ingredients
+
+
+def listMixNames():
+    mixenNames = []
+
+    with open("Receptboek.json") as f:
+        mixen = json.load(f)
+    for mix in mixen:
+        mixName = mix["name"]
+        mixenNames.append(mixName)
+    return mixenNames
+
+def listMixes():
+    allMixen = {}
+
+    with open("Receptboek.json") as f:
+        mixen = json.load(f)
+    for mix in mixen:
+        mixName = mix["name"]
+        composition = mix[composition]
+        allMixen.append(mixName, composition)
+    return allMixen
 
 def listMixenForPrint():
-        msg = "Mixen nu in het systeem zijn: \n"
-        mixList = listMixen()
+    msg = "Mixen nu in het systeem zijn: \n"
+    mixList = listMixNames()
 
-        for mixName in mixList:
-                msg += mixName + "\n"
-                
-        return msg
+    for mixName in mixList:
+        msg += mixName + "\n"
 
-#returnt een lijst van flessen
+    return msg
+
+
+# returned een lijst van flessen
 def listFlessen():
-        with open('flessen.json') as json_file:
-                data = json.load(json_file)
-        return data
+    with open('flessen.json') as json_file:
+        data = json.load(json_file)
+    return data
+
 
 def listFlessenForPrint():
-        msg = "Flessen nu in het systeem zijn: \n"
-        flesList = listFlessen()
+    msg = "Flessen nu in het systeem zijn: \n"
+    flesList = listFlessen()
 
-        for flesName in flesList:
-                msg += flesName + "\n"
-                
-        return msg
+    for flesName in flesList:
+        msg += flesName + "\n"
+
+    return msg
 
 
-def addMix(newDrinkName, ingredients):
-        page = {
-        "name" : newDrinkName,
-        "composition": ingredients
-        }
+def addMix(newMix=Mix()):
+    page = {
+        "name": newMix.name,
+        "composition": newMix.ingredients
+    }
 
-        with open('Receptboek.json') as json_file:
-                data = json.load(json_file)
-                data.append(page)
-        outfile = open("Receptboek.json", "w+")
-        json.dump(data, outfile, indent = 4)
-        outfile.close()
+    with open('Receptboek.json') as json_file:
+        data = json.load(json_file)
+        data.append(page)
+    outfile = open("Receptboek.json", "w+")
+    json.dump(data, outfile, indent=4)
+    outfile.close()
+
 
 def addFles(name):
-        data = listFlessen()
-        name = name.strip()
-        name = name.title()
-        data.append(name)
-        data.sort()
-        data = list(dict.fromkeys(data))
+    data = listFlessen()
+    name = name.strip()
+    name = name.title()
+    data.append(name)
+    data.sort()
+    data = list(dict.fromkeys(data))
 
-        outfile = open("flessen.json", "w+")
-        json.dump(data, outfile, indent = 0)
-        outfile.close()
-        print(name, "toegevoed")
+    outfile = open("flessen.json", "w+")
+    json.dump(data, outfile, indent=0)
+    outfile.close()
+    print(name, "toegevoed")
+
 
 def removeFles(name):
-        data = listFlessen()
-        name = name.strip()
-        name = name.title()
-        data.remove(name)
-        data.sort()
-        data = list(dict.fromkeys(data))
+    data = listFlessen()
+    name = name.strip()
+    name = name.title()
+    data.remove(name)
+    data.sort()
+    data = list(dict.fromkeys(data))
 
-        outfile = open("flessen.json", "w+")
-        json.dump(data, outfile, indent = 0)
-        outfile.close()
-        print(name, "toegevoed")
+    outfile = open("flessen.json", "w+")
+    json.dump(data, outfile, indent=0)
+    outfile.close()
+    print(name, "toegevoegd")
+
 
 def updatePositionFlessen(position, flesname):
-        with open("flessenInPosition.json") as f:
-                places = json.load(f)
+    with open("flessenInPosition.json") as f:
+        places = json.load(f)
+    places[position] = flesname
+    outfile = open("flessen.json", "w+")
 
-        places[position]
+    json.dump(places, outfile, indent=0)
+    outfile.close()
+
+def getMix(name):
+    return Mix(name, listMixes()[name])
+
+#def listAvailableMixes():
+    # returns a list with all creatable mixes
