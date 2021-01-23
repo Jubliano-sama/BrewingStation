@@ -9,20 +9,30 @@ class Mix:
         self.ingredients = ingredients
 
 
-def listMixen():
-    MixenNames = []
+def listMixNames():
+    mixenNames = []
 
     with open("Receptboek.json") as f:
         mixen = json.load(f)
     for mix in mixen:
         mixName = mix["name"]
-        MixenNames.append(mixName)
-    return MixenNames
+        mixenNames.append(mixName)
+    return mixenNames
 
+def listMixes():
+    allMixen = {}
+
+    with open("Receptboek.json") as f:
+        mixen = json.load(f)
+    for mix in mixen:
+        mixName = mix["name"]
+        composition = mix[composition]
+        allMixen.append(mixName, composition)
+    return allMixen
 
 def listMixenForPrint():
     msg = "Mixen nu in het systeem zijn: \n"
-    mixList = listMixen()
+    mixList = listMixNames()
 
     for mixName in mixList:
         msg += mixName + "\n"
@@ -97,6 +107,9 @@ def updatePositionFlessen(position, flesname):
 
     json.dump(places, outfile, indent=0)
     outfile.close()
+
+def getMix(name):
+    return Mix(name, listMixes()[name])
 
 #def listAvailableMixes():
     # returns a list with all creatable mixes
