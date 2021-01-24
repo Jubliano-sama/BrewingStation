@@ -2,7 +2,6 @@ import json
 
 print("BookController loaded")
 
-
 class Mix:
     def __init__(self, name="", ingredients={}):
         self.name = name

@@ -1,6 +1,7 @@
 #!/usr/bin/ python3
 import telebot
 import BookController
+import threading
 
 print("telegramBot loaded")
 token = "1500225290:AAEUN3lPnv7pOZmHphssGmLFB2Td1hr4-0o"
@@ -164,4 +165,5 @@ def echo_all(message):
                  "gebruik '/' om een commando te sturen, '/help' om een lijst te ontvangen met mogelijke commando's")
 
 
-bot.polling()
+backgroundCheck = threading.Thread(target=bot.polling)
+backgroundCheck.start()
