@@ -135,6 +135,8 @@ def handleMixIngredients(message):
                 bot.send_message(message.chat.id, "Je hebt geen ingrediënten of naam ingevuld. Probeer het nog een keer door /addMix te sturen")
     else:
         print("addMix canceled")
+        mixName = ""
+        composition = {}
 
 
 def handleOrder(message):
