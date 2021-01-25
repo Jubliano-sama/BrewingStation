@@ -25,7 +25,7 @@ def listMixes():
     for mix in mixen:
         mixName = mix["name"]
         composition = mix["composition"]
-        allMixen[mixName] = compostion
+        allMixen[mixName] = composition
     return allMixen
 
 def listMixenForPrint():
