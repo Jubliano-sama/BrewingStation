@@ -45,7 +45,7 @@ def listAvailableMixes():
         possible = True
         ingredienten = list(mix["composition"].keys())
         for ingredient in ingredienten:
-            if not ingredient in listAvilibleFlessen():
+            if not ingredient in listAvailableFlessen():
                 possible = False
                 break
         if possible:
@@ -53,19 +53,19 @@ def listAvailableMixes():
     
     return(mixenNames)
 
-def listFlessen():
+def listFlessenJSON():
     with open('flessen.json') as json_file:
         data = json.load(json_file)
     return data
 
-def listAvilibleFlessen():
+def listAvailableFlessen():
     with open('flessenInPosition.json') as json_file:
         data = json.load(json_file)
     return data
 
-def listFlessenForPrint():
-    msg = "Flessen nu in het systeem zijn: \n"
-    flesList = listFlessen()
+def listFlessenString():
+    msg = "Flessen nu in het systeem staan: \n"
+    flesList = listFlessenJSON()
 
     for flesName in flesList:
         msg += flesName + "\n"
@@ -89,7 +89,7 @@ def getMix(name):
     return Mix(name, listMixes()[name])
 
 def addFles(name):
-    data = listFlessen()
+    data = listFlessenJSON()
     name = name.strip()
     name = name.title()
     data.append(name)
@@ -102,7 +102,7 @@ def addFles(name):
     print(name, "toegevoed")
 
 def removeFles(name):
-    data = listFlessen()
+    data = listFlessenJSON()
     name = name.strip()
     name = name.title()
     data.remove(name)
