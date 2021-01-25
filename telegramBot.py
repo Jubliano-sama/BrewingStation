@@ -108,7 +108,6 @@ def handleFlesNameForPosition(message):
         msg = bot.send_message(message.chat.id, repons)
         bot.register_next_step_handler(msg, handleFlesNameForPosition)
 
-
 def handleFlesNameRemove(message):
     nameFlesToRemove = message.text
     # hier
@@ -116,11 +115,9 @@ def handleFlesNameRemove(message):
     msg = nameFlesToRemove + " is uit het systeem verwijderd."
     bot.send_message(message.chat.id, msg)
 
-
 def handleFlesNameAdd(message):
     nameFlesToAdd = message.text
     BookController.addFles(nameFlesToAdd)
-
 
 def handleMixNameAdd(message):
     global mixName
@@ -128,7 +125,6 @@ def handleMixNameAdd(message):
     returntext = "Oke we openen een nieuwe pagina in het kookboek schrijven voor een heerlijke Mixdrank. Je kunt zelf ingrdienten toevoegen dit doe je door een bericht te sturen in het volgende format\n [naamfles] [deel] \n b.v. \n 'Cola 20' \n\n Ben je klaar met het toevoegen van flessen? geef het commando 'KLAAR'"
     msg = bot.send_message(message.chat.id, returntext)
     bot.register_next_step_handler(msg, handleMixIngredients)
-
 
 def handleMixIngredients(message):
     messageText = message.text
@@ -188,7 +184,6 @@ def handleMixIngredients(message):
         print("addMix canceled")
         mixName = ""
         composition = {}
-
 
 def handleOrder(message):
     print("Handling Telegram order")
