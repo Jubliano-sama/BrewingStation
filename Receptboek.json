@@ -2,23 +2,23 @@
     {
         "name": "mojito",
         "composition": {
-            "bacardi": 50,
-            "bruiswater": 60,
-            "limoensap": 15
+            "Bacardi": 50,
+            "Bruiswater": 60,
+            "Limoensap": 15
         }
     },
     {
         "name": "baco",
         "composition": {
-            "bacardi": 1,
-            "cola": 3
+            "Bacardi": 1,
+            "Cola": 3
         }
     },
     {
         "name": "pasoa-jus",
         "composition": {
-            "jus": 2,
-            "pasoa": 1
+            "Jus": 2,
+            "Pasoa": 1
         }
     },
     {

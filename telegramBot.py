@@ -2,36 +2,41 @@
 import telebot
 import BookController
 import threading
-
+import random
 print("telegramBot loaded")
 token = "1500225290:AAEUN3lPnv7pOZmHphssGmLFB2Td1hr4-0o"
 bot = telebot.TeleBot(token)
 
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/examples/step_example.py
 
-ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order']
-
+ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order', 'updatePositie']
+ValidCommandsUpperLowerCase = []
 # global variabel
-
+# voor positie
+flesPosition = -1
 # voor addMix
 composition = {}
 mixName = ""
 orderCallback = None
 
+for command in ValidCommands:
+    ValidCommands.append(command.lower())
+    ValidCommands.append(command)
 
-@bot.message_handler(commands=ValidCommands)
+@bot.message_handler(commands=ValidCommandsUpperLowerCase)
 def mainHandler(message):
     boodschap = message.text
+    boodschap = boodschap.lower()
     print(boodschap)
 
-    if boodschap == "/addFles":
+    if boodschap == "/addfles":
         msg = bot.send_message(message.chat.id, "Aaahhhh een drankje toevoegen, komt goed! wat is de naam?")
         bot.register_next_step_handler(msg, handleFlesNameAdd)
 
-    elif boodschap == "/listFles":
+    elif boodschap == "/listfles":
         bot.send_message(message.chat.id, BookController.listFlessenForPrint())
 
-    elif boodschap == "/listMix":
+    elif boodschap == "/listmix":
         bot.send_message(message.chat.id, BookController.listMixenForPrint())
 
     elif boodschap == "/help":
@@ -42,20 +47,66 @@ def mainHandler(message):
 
         bot.send_message(message.chat.id, msg)
 
-    elif boodschap == "/removeFles":
+    elif boodschap == "/removefles":
         msg = bot.send_message(message.chat.id, "Aaahhhh een drankje verwijderen, komt goed! wat is de naam?")
         bot.register_next_step_handler(msg, handleFlesNameRemove)
 
-    elif boodschap == "/addMix":
+    elif boodschap == "/addmix":
         msg = bot.send_message(message.chat.id, "Wat is de naam van deze nieuwe smaak-sensatie")
         bot.register_next_step_handler(msg, handleMixNameAdd)
 
     elif boodschap == "/order":
-        msg = bot.send_message(message.chat.id, "Welk drankje wilt u bestellen?")
+        posAwns = ["*hik* Wa zoude lusse dan *hik*", "Welk drankje zou je willen maken dan?", "Ik dacht dat je het nooit zou vragen, Wat lust je?"]
+        awns = random.sample(posAwns, 1)
+        #return een lijst met mogelijke mixen
+        msg = bot.send_message(message.chat.id, awns)
         bot.register_next_step_handler(msg, handleOrder)
-
+    
+    elif boodschap == "/updatepositie":
+        msg = bot.send_message(message.chat.id, "Op welke positie wil je een andere fles toevoegen?")
+        bot.register_next_step_handler(msg, handlePosition)
     else:
         bot.reply_to(message, "Onbekend commando gebruik '/help' voor een lijst met commando's")
+
+def handlePosition(message):
+    global flesPosition
+    boodschap = message.text
+    boodschap = boodschap.strip()
+    position = -1
+    try: 
+        if int(boodschap) <= 11 and int(boodschap) >= 0:
+            position = int(boodschap)
+    if position == -1:
+        msg = bot.send_message(message.chat.id, "De positie moet een getal zijn van 0 tm 11, probeer het opnieuw")
+        bot.register_next_step_handler(msg, handlePosition)
+    else: 
+        flesPosition = position
+        repons = "Oké top we gaan de fles op positie " + boodschap + " veranderen, welke fles komt hier te staan?"
+        msg = bot.send_message(message.chat.id, repons)
+        bot.register_next_step_handler(msg, handleFlesNameForPosition)
+
+def handleFlesNameForPosition(message):
+    global flesPosition
+    boodschap = message.text
+    boodschap = boodschap.strip()
+    boodschap = boodschap.title()
+    flessenList = BookController.listFlessen()
+
+    if boodschap[0] == "+":
+                boodschap = boodschap[1:]
+                boodschap = boodschap.strip()
+                boodschap = boodschap.title()
+                BookController.addFles(boodschap)
+
+    if boodschap in flessenList:
+        global flesPosition
+        repons = "op positie: " + flesPosition + " staat nu " + boodschap + "."
+        bot.send_message(message.chat.id, repons)
+        BookController.updatePositionFlessen(flesPosition, boodschap)
+    else:
+        repons = "Deze fles bestaat niet, als U deze toe wil voegen herhaal Uw bericht met +[naamfles] \n De flessen die wel in het systeem staan zijn:\n" + BookController.listFlessenForPrint
+        msg = bot.send_message(message.chat.id, repons)
+        bot.register_next_step_handler(msg, handleFlesNameForPosition)
 
 
 def handleFlesNameRemove(message):
