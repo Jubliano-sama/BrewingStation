@@ -102,15 +102,15 @@ def handleFlesNameForPosition(message):
 
     if boodschap in flessenList:
         global flesPosition
-        repons = "Op positie: " + flesPosition + " staat nu " + boodschap + "."
+        repons = "Op positie: " + str(flesPosition) + " staat nu " + boodschap + "."
         bot.send_message(message.chat.id, repons)
         BookController.updatePositionFlessen(flesPosition, boodschap)
     else:
-        str = ""
+        stri = ""
         for fles in BookController.listAvailableFlessen():
             if fles != "":
-                str += fles.strip()
-                str += '\n'
+                stri += fles.strip()
+                stri += '\n'
         repons = "Deze fles bestaat niet, als U deze toe wil voegen herhaal Uw bericht met +[naamfles] \n De flessen die wel in het systeem staan zijn:\n" + str
         msg = bot.send_message(message.chat.id, repons)
         bot.register_next_step_handler(msg, handleFlesNameForPosition)
