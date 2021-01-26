@@ -53,7 +53,7 @@ def listAvailableMixes():
     
     return(mixenNames)
 
-def listFlessenJSON():
+def listFlessen():
     with open('flessen.json') as json_file:
         data = json.load(json_file)
     return data
@@ -65,7 +65,7 @@ def listAvailableFlessen():
 
 def listFlessenString():
     msg = "Flessen nu in het systeem staan: \n"
-    flesList = listFlessenJSON()
+    flesList = listFlessen()
 
     for flesName in flesList:
         msg += flesName + "\n"
@@ -89,7 +89,7 @@ def getMix(name):
     return Mix(name, listMixes()[name])
 
 def addFles(name):
-    data = listFlessenJSON()
+    data = listFlessen()
     name = name.strip()
     name = name.title()
     data.append(name)
@@ -102,7 +102,7 @@ def addFles(name):
     print(name, "toegevoed")
 
 def removeFles(name):
-    data = listFlessenJSON()
+    data = listFlessen()
     name = name.strip()
     name = name.title()
     data.remove(name)

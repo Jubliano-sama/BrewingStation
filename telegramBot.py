@@ -3,6 +3,7 @@ import telebot
 import BookController
 import threading
 import random
+
 print("telegramBot loaded")
 token = "1500225290:AAEUN3lPnv7pOZmHphssGmLFB2Td1hr4-0o"
 bot = telebot.TeleBot(token)
@@ -10,7 +11,7 @@ bot = telebot.TeleBot(token)
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/examples/step_example.py
 
 ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order', 'updatePositie']
-ValidCommandsUpperLowerCase = []
+#ValidCommandsUpperLowerCase = [] voor later
 # global variabel
 # voor positie
 flesPosition = -1
@@ -19,24 +20,19 @@ composition = {}
 mixName = ""
 orderCallback = None
 
-for command in ValidCommands:
-    ValidCommands.append(command.lower())
-    ValidCommands.append(command)
-
-@bot.message_handler(commands=ValidCommandsUpperLowerCase)
+@bot.message_handler(commands=ValidCommands)
 def mainHandler(message):
     boodschap = message.text
-    boodschap = boodschap.lower()
     print(boodschap)
 
-    if boodschap == "/addfles":
+    if boodschap == "/addFles":
         msg = bot.send_message(message.chat.id, "Aaahhhh een drankje toevoegen, komt goed! wat is de naam?")
         bot.register_next_step_handler(msg, handleFlesNameAdd)
 
-    elif boodschap == "/listfles":
+    elif boodschap == "/listFles":
         bot.send_message(message.chat.id, BookController.listFlessenString())
 
-    elif boodschap == "/listmix":
+    elif boodschap == "/listMix":
         bot.send_message(message.chat.id, BookController.listMixenForPrint())
 
     elif boodschap == "/help":
@@ -47,16 +43,17 @@ def mainHandler(message):
 
         bot.send_message(message.chat.id, msg)
 
-    elif boodschap == "/removefles":
+    elif boodschap == "/removeFles":
         msg = bot.send_message(message.chat.id, "Aaahhhh een drankje verwijderen, komt goed! wat is de naam?")
         bot.register_next_step_handler(msg, handleFlesNameRemove)
 
-    elif boodschap == "/addmix":
+    elif boodschap == "/addMix":
         msg = bot.send_message(message.chat.id, "Wat is de naam van deze nieuwe smaak-sensatie")
         bot.register_next_step_handler(msg, handleMixNameAdd)
 
     elif boodschap == "/order":
-        posAwns = ["*hik* Wa zoude lusse dan *hik*", "Welk drankje zou je willen maken dan?", "Ik dacht dat je het nooit zou vragen, Wat lust je?"]
+        posAwns = ["*hik* Wa zoude lusse dan *hik*", "Welk drankje zou je willen maken dan?",
+                   "Ik dacht dat je het nooit zou vragen, Wat lust je?"]
         awns = random.sample(posAwns, 1)
         awns += "\n"
         availableMixes = BookController.listAvailableMixes()
@@ -64,39 +61,44 @@ def mainHandler(message):
             awns += mix + "\n"
         msg = bot.send_message(message.chat.id, awns)
         bot.register_next_step_handler(msg, handleOrder)
-    
+
     elif boodschap == "/updatePositie":
         msg = bot.send_message(message.chat.id, "Op welke positie wil je een andere fles toevoegen?")
         bot.register_next_step_handler(msg, handlePosition)
     else:
         bot.reply_to(message, "Onbekend commando. Gebruik '/help' voor een lijst met commando's")
 
+
 def handlePosition(message):
     global flesPosition
     boodschap = message.text
     boodschap = boodschap.strip()
-    if(boodschap.isnumeric()):
+    if (boodschap.isnumeric()):
         if int(boodschap) <= 11 and int(boodschap) >= 0:
             flesPosition = int(boodschap)
             reponse = "Oké top we gaan de fles op positie " + boodschap + " veranderen, welke fles komt hier te staan?"
             msg = bot.send_message(message.chat.id, reponse)
             bot.register_next_step_handler(msg, handleFlesNameForPosition)
+        else:
+            msg = bot.send_message(message.chat.id, "De positie moet een getal zijn van 0 tm 11, probeer het opnieuw")
+            bot.register_next_step_handler(msg, handlePosition)
     else:
         msg = bot.send_message(message.chat.id, "De positie moet een getal zijn van 0 tm 11, probeer het opnieuw")
         bot.register_next_step_handler(msg, handlePosition)
+
 
 def handleFlesNameForPosition(message):
     global flesPosition
     boodschap = message.text
     boodschap = boodschap.strip()
     boodschap = boodschap.title()
-    flessenList = BookController.listFlessenJSON()
+    flessenList = BookController.listFlessen()
 
     if boodschap[0] == "+":
-                boodschap = boodschap[1:]
-                boodschap = boodschap.strip()
-                boodschap = boodschap.title()
-                BookController.addFles(boodschap)
+        boodschap = boodschap[1:]
+        boodschap = boodschap.strip()
+        boodschap = boodschap.title()
+        BookController.addFles(boodschap)
 
     if boodschap in flessenList:
         global flesPosition
@@ -104,9 +106,15 @@ def handleFlesNameForPosition(message):
         bot.send_message(message.chat.id, repons)
         BookController.updatePositionFlessen(flesPosition, boodschap)
     else:
-        repons = "Deze fles bestaat niet, als U deze toe wil voegen herhaal Uw bericht met +[naamfles] \n De flessen die wel in het systeem staan zijn:\n" + BookController.listAvailableFlessen()
+        str = ""
+        for fles in BookController.listAvailableFlessen():
+            if fles != "":
+                str += fles.strip()
+                str += '\n'
+        repons = "Deze fles bestaat niet, als U deze toe wil voegen herhaal Uw bericht met +[naamfles] \n De flessen die wel in het systeem staan zijn:\n" + str
         msg = bot.send_message(message.chat.id, repons)
         bot.register_next_step_handler(msg, handleFlesNameForPosition)
+
 
 def handleFlesNameRemove(message):
     nameFlesToRemove = message.text
@@ -114,75 +122,83 @@ def handleFlesNameRemove(message):
     msg = nameFlesToRemove + " is uit het systeem verwijderd."
     bot.send_message(message.chat.id, msg)
 
+
 def handleFlesNameAdd(message):
     nameFlesToAdd = message.text
     BookController.addFles(nameFlesToAdd)
 
+
 def handleMixNameAdd(message):
     global mixName
-    mixName = message.text
-    returntext = "Oke we openen een nieuwe pagina in het kookboek schrijven voor een heerlijke Mixdrank. Je kunt zelf ingrdienten toevoegen dit doe je door een bericht te sturen in het volgende format\n [naamfles] [deel] \n b.v. \n 'Cola 20' \n\n Ben je klaar met het toevoegen van flessen? geef het commando 'KLAAR'"
-    msg = bot.send_message(message.chat.id, returntext)
-    bot.register_next_step_handler(msg, handleMixIngredients)
+    if message.text:
+        if(message.text != "CANCEL"):
+            if message.text.lower() not in BookController.listMixNames():
+                mixName = message.text.lower()
+                returntext = "Oke we openen een nieuwe pagina in het kookboek schrijven voor een heerlijke Mixdrank. Je kunt zelf ingrdienten toevoegen dit doe je door een bericht te sturen in het volgende format\n [naamfles] [deel] \n b.v. \n 'Cola 20' \n\n Ben je klaar met het toevoegen van flessen? geef het commando 'KLAAR'"
+                msg = bot.send_message(message.chat.id, returntext)
+                bot.register_next_step_handler(msg, handleMixIngredients)
+            else:
+                msg = bot.send_message(message.chat.id, "Sorry, een mix met deze naam bestaat al. Probeer het opnieuw.")
+                bot.register_next_step_handler(msg, handleMixNameAdd)
+    else:
+        msg = bot.send_message(message.chat.id, "Vul een naam in om verder te gaan of typ \'CANCEL\'")
+        bot.register_next_step_handler(msg, handleMixNameAdd)
+
 
 def handleMixIngredients(message):
     messageText = message.text
-    if(messageText != "CANCEL"):
-        messageTextBackup = messageText
-        messageList = []
+    messageText.strip()
+    if (messageText != "CANCEL"):
         global composition
         global mixName
-
         if messageText != "KLAAR":
-
-            if messageText == "lijst":
+            messageText.title()
+            messageList = messageText.split()
+            if messageText == "Lijst":
                 msg = bot.send_message(message.chat.id, BookController.listFlessenString())
                 bot.register_next_step_handler(msg, handleMixIngredients)
-
-            if messageText[0] == "+":
-                messageText = messageText[1:]
-                messageText = messageText.strip()
-                messageText = messageText.title()
-                messageList = messageText.split(" ")
-                naamFles = messageList[0]
-                BookController.addFles(naamFles)
-
-            try:
-                if messageList == []:
-                    messageText = messageText.strip()
-                    messageText = messageText.title()
-                    messageList = messageText.split(" ")
-                naamFles = messageList[0]
-                deelVanMix = int(messageList[1])
-                if naamFles in BookController.listFlessenJSON():
-                    composition[naamFles] = deelVanMix
+            elif messageList[-1].isnumeric():
+                naamFles = messageText.rsplit(' ', 1)[0]
+                part = messageList[-1]
+                if messageText[0] == "+":
+                    naamFles = messageText[1:].rsplit(' ', 1)[0]
+                    tmp = messageText[1:]
+                    BookController.addFles(naamFles)
+                    composition[naamFles] = part
+                    msg = bot.send_message(message.chat.id,
+                                           "Staat genoteerd. Voeg op de zelfde mannier uw volgende fles toe, of om af te ronden stuur 'KLAAR'")
+                    bot.register_next_step_handler(msg, handleMixIngredients)
+                elif naamFles in BookController.listFlessen():
+                    composition[naamFles] = part
                     msg = bot.send_message(message.chat.id,
                                            "Staat genoteerd. Voeg op de zelfde mannier uw volgende drankje toe, of om af te ronden stuur 'KLAAR'")
                     bot.register_next_step_handler(msg, handleMixIngredients)
                 else:
+                    print(naamFles)
                     msg = bot.send_message(message.chat.id,
-                                           "Deze fles staat niet in het systeem, herhaal je bericht met een een '+' (b.v. '+ Cola 20') of reageer met 'lijst' om een overzicht van beschikbarenflessen te zien")
+                                           "Deze fles staat niet in het systeem, herhaal je bericht met een een '+' (b.v. '+Cola 20') of reageer met 'lijst' om een overzicht van beschikbarenflessen te zien")
                     bot.register_next_step_handler(msg, handleMixIngredients)
-
-            except:
-                if messageText != "lijst":
-                    msg = bot.send_message(message.chat.id, "Het format is incorrect probeer het opnieuw")
-                    bot.register_next_step_handler(msg, handleMixIngredients)
-
+            else:
+                msg = bot.send_message(message.chat.id,
+                                       "De syntax klopt niet, zorg dat je je bericht eindigt met het deel wat de drank van de mix uit zal maken.")
+                bot.register_next_step_handler(msg, handleMixIngredients)
         else:
-            if (mixName != "" and composition != {}):
+            if (composition != {}):
                 BookController.addMix(BookController.Mix(mixName, composition))
                 text = "Proficiat " + mixName + " staat nu in het receptenboek."
                 bot.send_message(message.chat.id, text)
                 mixName = ""
                 composition = {}
             else:
-                print("Error: mixname and/or composition empty")
-                bot.send_message(message.chat.id, "Je hebt geen ingrediënten of naam ingevuld. Probeer het nog een keer door /addMix te sturen")
+                print("Error: composition empty")
+                msg = bot.send_message(message.chat.id,
+                                 "Je hebt geen ingrediënten ingevuld. Probeer het nog een keer of typ \'CANCEL\' om te annuleren")
+                bot.register_next_step_handler(msg, handleMixIngredients)
     else:
         print("addMix canceled")
         mixName = ""
         composition = {}
+
 
 def handleOrder(message):
     print("Handling Telegram order")
