@@ -110,7 +110,6 @@ def handleFlesNameForPosition(message):
 
 def handleFlesNameRemove(message):
     nameFlesToRemove = message.text
-    # hier
     BookController.removeFles(nameFlesToRemove)
     msg = nameFlesToRemove + " is uit het systeem verwijderd."
     bot.send_message(message.chat.id, msg)
