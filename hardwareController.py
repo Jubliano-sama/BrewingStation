@@ -16,7 +16,7 @@ def findPosition():
 def travelToSpot(spot):
     motor = rpi_dc_lib.L298NMDc(20 ,21 ,16 ,50 ,True , "motor")
     direction = 1
-    currentSpot = findPosition()
+    currentSpot = findPosition() 
     if currentSpot is not spot:
         # finds fastest direction to travel to spot
         if currentSpot > spot:
