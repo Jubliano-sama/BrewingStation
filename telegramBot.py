@@ -20,8 +20,8 @@ mixName = ""
 orderCallback = None
 
 for command in ValidCommands:
-    ValidCommands.append(command.lower())
-    ValidCommands.append(command)
+    ValidCommandsUpperLowerCase.append(command.lower())
+    ValidCommandsUpperLowerCase.append(command)
 
 @bot.message_handler(commands=ValidCommandsUpperLowerCase)
 def mainHandler(message):
