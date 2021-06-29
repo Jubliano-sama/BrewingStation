@@ -76,6 +76,8 @@ def handlePosition(message):
     try: 
         if int(boodschap) <= 11 and int(boodschap) >= 0:
             position = int(boodschap)
+    except:
+        y = 1
     if position == -1:
         msg = bot.send_message(message.chat.id, "De positie moet een getal zijn van 0 tm 11, probeer het opnieuw")
         bot.register_next_step_handler(msg, handlePosition)

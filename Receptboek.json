@@ -1,45 +1,6 @@
-[
-    {
-        "name": "mojito",
-        "composition": {
-            "Bacardi": 50,
-            "Bruiswater": 60,
-            "Limoensap": 15
-        }
-    },
-    {
-        "name": "baco",
-        "composition": {
-            "Bacardi": 1,
-            "Cola": 3
-        }
-    },
-    {
-        "name": "pasoa-jus",
-        "composition": {
-            "Jus": 2,
-            "Pasoa": 1
-        }
-    },
-    {
-        "name": "raketje",
-        "composition": {
-            "fanta": 4,
-            "schrobbeler": 4
-        }
-    },
-    {
-        "name": "j\u00e4gerbom",
-        "composition": {
-            "fanta": 3,
-            "apfelkorn": 5
-        }
-    },
-    {
-        "name": "Safari 7-up",
-        "composition": {
-            "Safari": 1,
-            "7-Up": 1
-        }
+{
+    "baco": {
+        "Bacardi": 1,
+        "Cola": 3
     }
-]
+}

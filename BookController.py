@@ -80,7 +80,8 @@ def addMix(newMix=Mix()):
 
     with open('Receptboek.json') as json_file:
         data = json.load(json_file)
-        data.append(page)
+        data[newMix.name] = newMix.ingredients
+        
     outfile = open("Receptboek.json", "w+")
     json.dump(data, outfile, indent=4)
     outfile.close()
@@ -99,6 +100,7 @@ def addFles(name):
     outfile = open("flessen.json", "w+")
     json.dump(data, outfile, indent=0)
     outfile.close()
+
     print(name, "toegevoed")
 
 def removeFles(name):
@@ -123,4 +125,19 @@ def updatePositionFlessen(position, flesname):
     json.dump(places, outfile, indent=0)
     outfile.close()
 
+def getFlesPosition(flesnaam):
+    with open('flessenInPosition.json') as json_file:
+        data = json.load(json_file)
+    position  = data.index(flesnaam)
+    return position+1
 
+print(getFlesPosition("Cola"))
+
+veg = {
+            "Bacardi": 1,
+            "Cola": 3
+        }
+
+baco = Mix(name = "baco", ingredients=veg)
+
+addMix(baco)
