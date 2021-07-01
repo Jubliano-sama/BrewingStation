@@ -72,6 +72,10 @@ def listFlessenForPrint():
 
     return msg
 
+#returns list of possible mixes
+def possibleMixes():
+
+
 def addMix(newMix=Mix()):
     page = {
         "name": newMix.name,

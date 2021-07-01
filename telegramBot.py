@@ -9,7 +9,7 @@ bot = telebot.TeleBot(token)
 
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/examples/step_example.py
 
-ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order', 'updatePositie']
+ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order', 'updatePositie', 'makeMix']
 ValidCommandsUpperLowerCase = []
 # global variabel
 # voor positie
@@ -65,6 +65,11 @@ def mainHandler(message):
     elif boodschap == "/updatepositie":
         msg = bot.send_message(message.chat.id, "Op welke positie wil je een andere fles toevoegen?")
         bot.register_next_step_handler(msg, handlePosition)
+    
+    elif boodschap == '/makemix':
+        #maak een functie die kan zoeken welke drankjes maakbaar zijn
+        msg = bot.send_message(message.chat.id, "
+
     else:
         bot.reply_to(message, "Onbekend commando gebruik '/help' voor een lijst met commando's")
 
