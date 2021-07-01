@@ -131,13 +131,20 @@ def getFlesPosition(flesnaam):
     position  = data.index(flesnaam)
     return position+1
 
-print(getFlesPosition("Cola"))
+def getIngrdients(mixname):
+    with open('Receptboek.json') as json_file:
+        data = json.load(json_file)
+        return data[mixname]
+    
+#print(getIngrdients('baco'))
+#print(getFlesPosition("Cola"))
 
-veg = {
-            "Bacardi": 1,
-            "Cola": 3
-        }
 
-baco = Mix(name = "baco", ingredients=veg)
+#veg = {
+#            "Bacardi": 1,
+ #           "Cola": 3
+  #      }
 
-addMix(baco)
+#baco = Mix(name = "baco", ingredients=veg)
+
+#addMix(baco)
