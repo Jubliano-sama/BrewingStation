@@ -1,19 +1,30 @@
 import BookController
-import telegramBot
+#import telegramBot
 import uiController
-#import hardwareController
+import hardwareControllerr
+import time 
+
+
+def cleaning():
+    position = BookController.getFlesPosition('Spoel Water')
+    hardwareControllerr.travelTo(position)
+        
+    hardwareControllerr.pump(10, 'up')
+    hardwareControllerr.pump(10, 'down')
 
 
 def makeDrink(name, volume):
+    #verzamelen van de data
     mixToMake = BookController.getIngrdients(name)
-    
     drinksInMix = list(mixToMake.keys())
     amountInDrinks = list(mixToMake.values())
+
+    #het formateren van de data om overzichtelijker alles overzichtelijker te houden
 
     total = sum(amountInDrinks)
 
     parallelDrinkPosition = []
-    parallelPart = []
+    parallelVolume = []
     
     leng = len(mixToMake)
 
@@ -25,15 +36,26 @@ def makeDrink(name, volume):
 
         intPart = amountInDrinks[i]
         partInDrink = (intPart/total) * volume
-        parallelPart.append(partInDrink)
+        parallelVolume.append(int(partInDrink))
+
+
+    for i in range(leng):
+        position = parallelDrinkPosition[i]
+        volumeOfPart = parallelVolume[i]
+
+
+        #kijk nog eventjes of dit voldoende is, of dat je het rietje nog moet bedienen
+        hardwareControllerr.travelTo(position)
+        
+        hardwareControllerr.pump(volumeOfPart, 'up')
+        hardwareControllerr.pump(10, 'down')
     
-    print(parallelDrinkPosition)
-    print(parallelPart)
-    print(drinksInMix)
+    time.sleep(5)
 
-    #for i in range(leng):
-
+    cleaning()
 
     
 
-makeDrink('baco', 2024)
+    
+
+makeDrink('baco', 200)
