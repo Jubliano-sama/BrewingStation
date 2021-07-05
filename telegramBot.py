@@ -4,6 +4,7 @@ import BookController
 import threading
 import random
 import main
+import math
 print("telegramBot loaded")
 token = "1500225290:AAEUN3lPnv7pOZmHphssGmLFB2Td1hr4-0o"
 bot = telebot.TeleBot(token)
@@ -12,10 +13,8 @@ bot = telebot.TeleBot(token)
 
 ValidCommands = ['addFles', 'listFles', 'listMix', 'help', 'removeFles', 'addMix', 'order', 'updatePositie', 'makeMix']
 ValidCommandsUpperLowerCase = []
-# global variabel
-# voor positie
+# globale variabelen voor de telegrambot die interfunctionair nodig zijn
 flesPosition = -1
-# voor addMix
 composition = {}
 mixName = ""
 orderCallback = None
@@ -26,6 +25,7 @@ for command in ValidCommands:
     ValidCommandsUpperLowerCase.append(command.lower())
     ValidCommandsUpperLowerCase.append(command)
 
+#op het moment dat er een commado word gegeven verwerkt deze functie het commando
 @bot.message_handler(commands=ValidCommandsUpperLowerCase)
 def mainHandler(message):
     boodschap = message.text
@@ -45,6 +45,7 @@ def mainHandler(message):
     elif boodschap == "/help":
 
         msg = "Beschikbare commando's zijn: \n"
+        #opbouw lijst met alle commando's
         for command in ValidCommands:
             msg += '/' + command + '\n'
 
@@ -58,19 +59,13 @@ def mainHandler(message):
         msg = bot.send_message(message.chat.id, "Wat is de naam van deze nieuwe smaak-sensatie")
         bot.register_next_step_handler(msg, handleMixNameAdd)
 
-    elif boodschap == "/order":
-        posAwns = ["*hik* Wa zoude lusse dan *hik*", "Welk drankje zou je willen maken dan?", "Ik dacht dat je het nooit zou vragen, Wat lust je?"]
-        awns = random.sample(posAwns, 1)
-        #return een lijst met mogelijke mixen
-        msg = bot.send_message(message.chat.id, awns)
-        bot.register_next_step_handler(msg, handleOrder)
     
     elif boodschap == "/updatepositie":
         msg = bot.send_message(message.chat.id, "Op welke positie wil je een andere fles toevoegen?")
         bot.register_next_step_handler(msg, handlePosition)
     
     elif boodschap == '/makemix':
-        #maak een functie die kan zoeken welke drankjes maakbaar zijn
+       #bouw een bericht op welke alle beschikbare dranken doorgeeft
         mixes = BookController.listAvailableMixes
         bericht = 'De beschikbare dranken zijn: /n'
         for mix in mixes:
@@ -81,8 +76,10 @@ def mainHandler(message):
 
         bot.register_next_step_handler(msg, handleMixNaam)
 
+    #in het geval het commando niet word herkent word gesuggereerd het help commando te gebruiken
     else:
         bot.reply_to(message, "Onbekend commando gebruik '/help' voor een lijst met commando's")
+
 
 def handleMixNaam(message):
     global mixToMakeName
@@ -104,26 +101,37 @@ def handleMixNaam(message):
         bot.register_next_step_handler(msg, handleMixNaam)
 
 def handleMixVolume(message):
+    #data ophalen
     global mixToMakeVolume
     global mixToMakeName
     boodschap = message.text
     boodschap = boodschap.strip()
-    try:
-        mixToMakeVolume = int(boodschap)
-        main.makeDrink(mixToMakeName, mixToMakeVolume)
-        bot.send_message(message.chat.id, 'Sir yes Sir!')
-    except: 
-        msg = bot.send_message(message.chat.id, 'input heeft het verkeerde format, gebruik integers')
-        bot.register_next_step_handler(msg, handleMixVolume)
 
+    if boodschap.lower() != 'cancel':
+        #kijken of de input valide is en anders terug lopen tot er een goede hoeveelheid op word gegeven
+        try:
+            mixToMakeVolume = int(boodschap)
+            math.sqrt(mixToMakeVolume) #op het moment dat een input fout is probeer ik in deze try een foutmelding te genereren, als iemand een negatieve waarde heeft ingevult krijg je hier een fout en word je terug geloopt om het opniew te proberen
+            bot.send_message(message.chat.id, 'Sir yes Sir!')
+            main.makeDrink(mixToMakeName, mixToMakeVolume)
+            bot.send_message(message.chat.id, 'Uw drankjes is gereed')
+            
+        except: 
+            msg = bot.send_message(message.chat.id, 'input heeft het verkeerde format, gebruik positieve integers')
+            bot.register_next_step_handler(msg, handleMixVolume)
+    #een mogelijkheid voor mensen om te stoppeen met het maken van hun drankje
+    else: msg = bot.send_message(message.chat.id, '*sad alchoholic noices*')
     
 
-
+#een functie die zich bezig houd met het instellen van positiets van drankjes
 def handlePosition(message):
+    #voorbereiding data
     global flesPosition
     boodschap = message.text
     boodschap = boodschap.strip()
     position = -1
+
+    #controle goede format
     try: 
         if int(boodschap) <= 11 and int(boodschap) >= 0:
             position = int(boodschap)
@@ -136,27 +144,33 @@ def handlePosition(message):
         flesPosition = position
         repons = "Oké top we gaan de fles op positie " + boodschap + " veranderen, welke fles komt hier te staan?"
         msg = bot.send_message(message.chat.id, repons)
+        #door verwijzing naar volgende functie als het goede format is gegeven
         bot.register_next_step_handler(msg, handleFlesNameForPosition)
 
 def handleFlesNameForPosition(message):
+    #data ophalen
     global flesPosition
     boodschap = message.text
     boodschap = boodschap.strip()
     boodschap = boodschap.title()
     flessenList = BookController.listFlessen()
 
+    #als iemand een fles toe wil voegen die niet in het systeem staat kan dit meteen door een '+' te gebruiken voor de naam van het drankje
     if boodschap[0] == "+":
                 boodschap = boodschap[1:]
                 boodschap = boodschap.strip()
                 boodschap = boodschap.title()
                 BookController.addFles(boodschap)
 
+    
     if boodschap in flessenList:
+        #verwerking indien positie is correct
         global flesPosition
         repons = "op positie: " + flesPosition + " staat nu " + boodschap + "."
         bot.send_message(message.chat.id, repons)
         BookController.updatePositionFlessen(flesPosition, boodschap)
     else:
+        #een onbekende fles is toegevoegd en word terug geloopt tot een correcte naam is gegeven
         repons = "Deze fles bestaat niet, als U deze toe wil voegen herhaal Uw bericht met +[naamfles] \n De flessen die wel in het systeem staan zijn:\n" + BookController.listFlessenForPrint
         msg = bot.send_message(message.chat.id, repons)
         bot.register_next_step_handler(msg, handleFlesNameForPosition)
@@ -164,7 +178,6 @@ def handleFlesNameForPosition(message):
 
 def handleFlesNameRemove(message):
     nameFlesToRemove = message.text
-    # hier
     BookController.removeFles(nameFlesToRemove)
     msg = nameFlesToRemove + " is uit het systeem verwijderd."
     bot.send_message(message.chat.id, msg)
@@ -185,18 +198,22 @@ def handleMixNameAdd(message):
 
 def handleMixIngredients(message):
     messageText = message.text
-    if(messageText != "CANCEL"):
+    #eerst een controle of mensen nog door willen gaan
+    if(messageText.lower() != "cancel"):
+        #data klaarzetten
         messageTextBackup = messageText
         messageList = []
         global composition
         global mixName
 
+        #conrtoleren of het drankje niet al klaar is anders
         if messageText != "KLAAR":
-
+            #als mensen een lijst met flessen willen zien die ze toe willen voegen
             if messageText == "lijst":
                 msg = bot.send_message(message.chat.id, BookController.listFlessenForPrint())
                 bot.register_next_step_handler(msg, handleMixIngredients)
 
+            #ook hier kunnen mensen meteen een fles toevoegen aan het systeem 
             if messageText[0] == "+":
                 messageText = messageText[1:]
                 messageText = messageText.strip()
@@ -205,6 +222,7 @@ def handleMixIngredients(message):
                 naamFles = messageList[0]
                 BookController.addFles(naamFles)
 
+            #een controle of het goede format is behaald
             try:
                 if messageList == []:
                     messageText = messageText.strip()
@@ -213,6 +231,7 @@ def handleMixIngredients(message):
                 naamFles = messageList[0]
                 deelVanMix = int(messageList[1])
                 if naamFles in BookController.listFlessen():
+                    #waneer het bericht tot hier is gekomen betekend dit dat het in het goede format was en dat het verwerkt kan worden
                     composition[naamFles] = deelVanMix
                     msg = bot.send_message(message.chat.id,
                                            "Staat genoteerd. Voeg op de zelfde mannier uw volgende drankje toe, of om af te ronden stuur 'KLAAR'")
@@ -221,7 +240,7 @@ def handleMixIngredients(message):
                     msg = bot.send_message(message.chat.id,
                                            "Deze fles staat niet in het systeem, herhaal je bericht met een een '+' (b.v. '+ Cola 20') of reageer met 'lijst' om een overzicht van beschikbarenflessen te zien")
                     bot.register_next_step_handler(msg, handleMixIngredients)
-
+########################################################################### nog onderste helft van errorhandling
             except:
                 if messageText != "lijst":
                     msg = bot.send_message(message.chat.id, "Het format is incorrect probeer het opnieuw")
@@ -241,27 +260,8 @@ def handleMixIngredients(message):
         print("addMix canceled")
         mixName = ""
         composition = {}
+#####################################################################################
 
-
-def handleOrder(message):
-    print("Handling Telegram order")
-    if (message.text != "CANCEL"):
-        if (message.text != "/addMix"):
-            if (message.text in BookController.listMixNames()):
-                if callable(orderCallback):
-                    orderCallback(BookController.getMix(message.text))
-                    bot.send_message(message.chat.id, "Je bestelling staat in de wachtrij!")
-                else:
-                    print("Error: orderCallback telegramBot empty")
-                    bot.send_message(message.chat.id, "Error: orderCallback empty")
-            else:
-                msg = bot.send_message(message.chat.id,
-                                       "Die mix bestaat niet, probeer het opnieuw of voeg een mix toe met het /addMix commando. Typ CANCEL om te annuleren.")
-                bot.register_next_step_handler(msg, handleOrder)
-        else:
-            handleMixNameAdd(message)
-    else:
-        print("Telegram order canceled")
 
 
 # error handler

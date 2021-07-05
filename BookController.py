@@ -2,10 +2,15 @@ import json
 
 print("BookController loaded")
 
+
+################################################################## alles voor mixen
+
 class Mix:
     def __init__(self, name="", ingredients={}):
         self.name = name
         self.ingredients = ingredients
+
+
 
 def listMixNames():
     with open("Receptboek.json") as json_file:
@@ -15,41 +20,59 @@ def listMixNames():
 
     return mixes
 
-#def listMixes():
-#    allMixen = {}
-#
- #   with open("Receptboek.json") as f:
-  #      mixen = json.load(f)
-#    for mix in mixen:
-#        mixName = mix["name"]
- #       composition = mix["composition"]
-  #      allMixen.update(mixName, composition)
-   # return allMixen
-
 def listMixenForPrint():
     msg = "Mixen nu in het systeem zijn: \n"
     mixList = listMixNames()
-
+    #opbouw string voor alle mixen in het systeem
     for mixName in mixList:
         msg += mixName + "\n"
 
     return msg
 
-#def listAvailableMixes():
-#    mixenNames = []
-#    with open("Receptboek.json") as f:
-#        mixen = json.load(f)
-#    for mix in mixen:
-#        possible = True
-#        ingredienten = list(mix["composition"].keys())
-#        for ingredient in ingredienten:
-#            if not ingredient in listAvilibleFlessen():
-#                possible = False
-#                break
-#        if possible:
-#            mixenNames.append(mix["name"])
+def listAvailableMixes():
+    #verzameling data
+    availableMixes = []
+
+    with open('flessenInPosition.json') as json_file:
+        drinksInSystem = json.load(json_file)
+    with open("Receptboek.json") as json_file:
+        book = json.load(json_file)
     
-#    return(mixenNames)
+    #het maken van een lijst van alle drankjes
+    mixes = list(book.keys())
+
+    for name in mixes:
+        mix = book[name]
+        #per mix worden de flessen opgeslagen in een list
+        bottles = list(mix.keys())
+        
+        possible = True
+        for bottle in bottles:
+            if bottle not in drinksInSystem: possible = False # als er een fles mist zal deze loop hem op niet mogelijk zetten
+        
+        #als na de loop de mix nogsteeds mogelijk blijkt word deze toegevoegd aan mogelijke mixen
+        if possible: availableMixes.append(name)
+        
+    
+    return availableMixes
+
+#een functie die aan geroepen word vanuit de telegrambot om een mix op te slaan in het systeem
+def addMix(newMix=Mix()):
+    page = {
+        "name": newMix.name,
+        "composition": newMix.ingredients
+    }
+
+    with open('Receptboek.json') as json_file:
+        data = json.load(json_file)
+        data[newMix.name] = newMix.ingredients
+        
+    outfile = open("Receptboek.json", "w+")
+    json.dump(data, outfile, indent=4)
+    outfile.close()
+
+
+############################################################################################# alles voor flessen
 
 def listFlessen():
     with open('flessen.json') as json_file:
@@ -65,88 +88,51 @@ def listFlessenForPrint():
     msg = "Flessen nu in het systeem zijn: \n"
     flesList = listFlessen()
 
+    #opbouw string
     for flesName in flesList:
         msg += flesName + "\n"
 
     return msg
 
-#returns list of possible mixes
-def listAvailableMixes():
-
-    availableMixes = []
-
-    with open('flessenInPosition.json') as json_file:
-        drinksInSystem = json.load(json_file)
-    with open("Receptboek.json") as json_file:
-        book = json.load(json_file)
-    
-    mixes = list(book.keys())
-
-    #print(mixes)
-
-    for name in mixes:
-        mix = book[name]
-        bottles = list(mix.keys())
-        #print(name, bottles)
-        possible = True
-        for bottle in bottles:
-            if bottle not in drinksInSystem: possible = False
-        
-        if possible: availableMixes.append(name)
-        #print(list(mix.keys()))
-    
-    return availableMixes
-
-def addMix(newMix=Mix()):
-    page = {
-        "name": newMix.name,
-        "composition": newMix.ingredients
-    }
-
-    with open('Receptboek.json') as json_file:
-        data = json.load(json_file)
-        data[newMix.name] = newMix.ingredients
-        
-    outfile = open("Receptboek.json", "w+")
-    json.dump(data, outfile, indent=4)
-    outfile.close()
-
-def getMix(name):
-    return Mix(name, listMixes()[name])
-
 def addFles(name):
+    #data verzameling
     data = listFlessen()
     name = name.strip()
     name = name.title()
     data.append(name)
-    data.sort()
-    data = list(dict.fromkeys(data))
+    data.sort() #sorteert de flessen alfabetische
+    data = list(dict.fromkeys(data)) #zorgt er voor dat drankjes niet dubbel worden toegevoed
 
+    #verwerking
     outfile = open("flessen.json", "w+")
     json.dump(data, outfile, indent=0)
     outfile.close()
 
+    #feedback naar console voor debug
     print(name, "toegevoed")
 
 def removeFles(name):
+    #data verzamelen
     data = listFlessen()
     name = name.strip()
     name = name.title()
     data.remove(name)
-    data.sort()
-    data = list(dict.fromkeys(data))
-
+    #data opslaan
     outfile = open("flessen.json", "w+")
     json.dump(data, outfile, indent=0)
     outfile.close()
     print(name, "toegevoegd")
 
 def updatePositionFlessen(position, flesname):
+    #inladen data
     with open("flessenInPosition.json") as f:
         places = json.load(f)
+    
+    #updaten
     places[position] = flesname
-    outfile = open("flessenInPosition.json", "w+")
 
+    #wegschrijven
+    outfile = open("flessenInPosition.json", "w+")
     json.dump(places, outfile, indent=0)
     outfile.close()
 
@@ -154,24 +140,10 @@ def getFlesPosition(flesnaam):
     with open('flessenInPosition.json') as json_file:
         data = json.load(json_file)
     position  = data.index(flesnaam)
-    return position+1
+    return position+1 # +1 omdat we niet met een 0 positie werken
 
 def getIngrdients(mixname):
     with open('Receptboek.json') as json_file:
         data = json.load(json_file)
         return data[mixname]
     
-#print(getIngrdients('baco'))
-#print(getFlesPosition("Cola"))
-
-print(listAvailableMixes())
-print(listMixNames())
-
-#veg = {
-#            "Bacardi": 1,
- #           "Cola": 3
-  #      }
-
-#baco = Mix(name = "baco", ingredients=veg)
-
-#addMix(baco)
