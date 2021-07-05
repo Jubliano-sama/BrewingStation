@@ -3,6 +3,7 @@ import telebot
 import BookController
 import threading
 import random
+import main
 print("telegramBot loaded")
 token = "1500225290:AAEUN3lPnv7pOZmHphssGmLFB2Td1hr4-0o"
 bot = telebot.TeleBot(token)
@@ -18,6 +19,8 @@ flesPosition = -1
 composition = {}
 mixName = ""
 orderCallback = None
+mixToMakeName = ""
+mixToMakeVolume = ""
 
 for command in ValidCommands:
     ValidCommandsUpperLowerCase.append(command.lower())
@@ -68,10 +71,53 @@ def mainHandler(message):
     
     elif boodschap == '/makemix':
         #maak een functie die kan zoeken welke drankjes maakbaar zijn
-        msg = bot.send_message(message.chat.id, "
+        mixes = BookController.listAvailableMixes
+        bericht = 'De beschikbare dranken zijn: /n'
+        for mix in mixes:
+            bericht += mix
+            bericht += '/n'
+
+        msg = bot.send_message(message.chat.id, bericht)
+
+        bot.register_next_step_handler(msg, handleMixNaam)
 
     else:
         bot.reply_to(message, "Onbekend commando gebruik '/help' voor een lijst met commando's")
+
+def handleMixNaam(message):
+    global mixToMakeName
+    boodschap = message.text
+    boodschap = boodschap.strip()
+    if boodschap in BookController.listAvailableMixes():
+        mixToMakeName = boodschap
+        msg = bot.send_message("hoeveel ml?")
+        bot.register_next_step_handler(msg, handleMixVolume)
+    else: 
+        mixes = BookController.listAvailableMixes
+        bericht = 'Deze mix is niet beschikbaar. De beschikbare dranken zijn: /n'
+        for mix in mixes:
+            bericht += mix
+            bericht += '/n'
+
+        msg = bot.send_message(message.chat.id, bericht)
+
+        bot.register_next_step_handler(msg, handleMixNaam)
+
+def handleMixVolume(message):
+    global mixToMakeVolume
+    global mixToMakeName
+    boodschap = message.text
+    boodschap = boodschap.strip()
+    try:
+        mixToMakeVolume = int(boodschap)
+        main.makeDrink(mixToMakeName, mixToMakeVolume)
+        bot.send_message(message.chat.id, 'Sir yes Sir!')
+    except: 
+        msg = bot.send_message(message.chat.id, 'input heeft het verkeerde format, gebruik integers')
+        bot.register_next_step_handler(msg, handleMixVolume)
+
+    
+
 
 def handlePosition(message):
     global flesPosition

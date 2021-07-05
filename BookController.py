@@ -8,25 +8,23 @@ class Mix:
         self.ingredients = ingredients
 
 def listMixNames():
-    mixenNames = []
+    with open("Receptboek.json") as json_file:
+        book = json.load(json_file)
+    
+    mixes = list(book.keys())
 
-    with open("Receptboek.json") as f:
-        mixen = json.load(f)
-    for mix in mixen:
-        mixName = mix["name"]
-        mixenNames.append(mixName)
-    return mixenNames
+    return mixes
 
-def listMixes():
-    allMixen = {}
-
-    with open("Receptboek.json") as f:
-        mixen = json.load(f)
-    for mix in mixen:
-        mixName = mix["name"]
-        composition = mix["composition"]
-        allMixen.update(mixName, composition)
-    return allMixen
+#def listMixes():
+#    allMixen = {}
+#
+ #   with open("Receptboek.json") as f:
+  #      mixen = json.load(f)
+#    for mix in mixen:
+#        mixName = mix["name"]
+ #       composition = mix["composition"]
+  #      allMixen.update(mixName, composition)
+   # return allMixen
 
 def listMixenForPrint():
     msg = "Mixen nu in het systeem zijn: \n"
@@ -37,21 +35,21 @@ def listMixenForPrint():
 
     return msg
 
-def listAvailableMixes():
-    mixenNames = []
-    with open("Receptboek.json") as f:
-        mixen = json.load(f)
-    for mix in mixen:
-        possible = True
-        ingredienten = list(mix["composition"].keys())
-        for ingredient in ingredienten:
-            if not ingredient in listAvilibleFlessen():
-                possible = False
-                break
-        if possible:
-            mixenNames.append(mix["name"])
+#def listAvailableMixes():
+#    mixenNames = []
+#    with open("Receptboek.json") as f:
+#        mixen = json.load(f)
+#    for mix in mixen:
+#        possible = True
+#        ingredienten = list(mix["composition"].keys())
+#        for ingredient in ingredienten:
+#            if not ingredient in listAvilibleFlessen():
+#                possible = False
+#                break
+#        if possible:
+#            mixenNames.append(mix["name"])
     
-    return(mixenNames)
+#    return(mixenNames)
 
 def listFlessen():
     with open('flessen.json') as json_file:
@@ -73,8 +71,31 @@ def listFlessenForPrint():
     return msg
 
 #returns list of possible mixes
-def possibleMixes():
+def listAvailableMixes():
 
+    availableMixes = []
+
+    with open('flessenInPosition.json') as json_file:
+        drinksInSystem = json.load(json_file)
+    with open("Receptboek.json") as json_file:
+        book = json.load(json_file)
+    
+    mixes = list(book.keys())
+
+    #print(mixes)
+
+    for name in mixes:
+        mix = book[name]
+        bottles = list(mix.keys())
+        #print(name, bottles)
+        possible = True
+        for bottle in bottles:
+            if bottle not in drinksInSystem: possible = False
+        
+        if possible: availableMixes.append(name)
+        #print(list(mix.keys()))
+    
+    return availableMixes
 
 def addMix(newMix=Mix()):
     page = {
@@ -143,6 +164,8 @@ def getIngrdients(mixname):
 #print(getIngrdients('baco'))
 #print(getFlesPosition("Cola"))
 
+print(listAvailableMixes())
+print(listMixNames())
 
 #veg = {
 #            "Bacardi": 1,
